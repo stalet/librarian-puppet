@@ -74,6 +74,7 @@ Feature: cli/install/forge
     And the file "puppet/modules/apt/Modulefile" should match /name *'puppetlabs-apt'/
     And the file "puppet/modules/stdlib/Modulefile" should match /name *'puppetlabs-stdlib'/
 
+  @announce
   @veryslow
   Scenario: Handle range version numbers
     Given a file named "Puppetfile" with:
@@ -82,7 +83,7 @@ Feature: cli/install/forge
 
     mod 'puppetlabs/postgresql'
     """
-    When I run `librarian-puppet install`
+    When I run `librarian-puppet install --verbose`
     Then the exit status should be 0
     And the file "modules/postgresql/Modulefile" should match /name *'puppetlabs-postgresql'/
 
@@ -92,7 +93,7 @@ Feature: cli/install/forge
 
     mod 'puppetlabs/postgresql', :git => 'git://github.com/puppetlabs/puppet-postgresql'
     """
-    When I run `librarian-puppet install`
+    When I run `librarian-puppet install --verbose`
     Then the exit status should be 0
     And the file "modules/postgresql/Modulefile" should match /name *'puppetlabs-postgresql'/
 
