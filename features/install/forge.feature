@@ -93,6 +93,8 @@ Feature: cli/install/forge
 
     mod 'puppetlabs/postgresql', :git => 'git://github.com/puppetlabs/puppet-postgresql'
     """
+    When I run `find .`
+    When I run `ls -alF modules/postgresql/spec/acceptance/nodesets/`
     When I run `librarian-puppet install --verbose`
     Then the exit status should be 0
     And the file "modules/postgresql/Modulefile" should match /name *'puppetlabs-postgresql'/
