@@ -41,13 +41,10 @@ module Librarian
 
         def install_perform_step_copy!(found_path, install_path)
           debug { "Copying #{relative_path_to(found_path)} to #{relative_path_to(install_path)}" }
-          debug { `find #{found_path} -type f` }
-          begin
-            stat = File::Stat.new("#{found_path}/spec/acceptance/nodesets/default.yml")
-            debug { "mode = #{stat.mode}" }
-          rescue
-          end
-          debug { `ls -alFh #{found_path}/spec/acceptance/nodesets/default.yml` }
+          debug { found_path }
+          debug { `ls -alFh #{found_path}/spec/acceptance/nodesets/` }
+          debug { install_path }
+          debug { `ls -alFh #{install_path}/spec/acceptance/nodesets/` }
           FileUtils.cp_r(found_path, install_path, :preserve => true)
         end
 

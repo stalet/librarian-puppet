@@ -91,7 +91,7 @@ Feature: cli/install/forge
     """
     forge "http://forge.puppetlabs.com"
 
-    mod 'puppetlabs/postgresql', :git => 'git://github.com/puppetlabs/puppet-postgresql'
+    mod 'puppetlabs/postgresql', :git => 'git://github.com/puppetlabs/puppet-postgresql', :ref => 'a353e8'
     """
     When I run `librarian-puppet install --verbose`
     Then the exit status should be 0
