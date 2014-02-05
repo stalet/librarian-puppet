@@ -18,6 +18,7 @@ module Librarian
           FileUtils.cp_r(src, dest, :preserve => true)
         rescue Errno::ENOENT
           debug { "Failed to copy from #{src} to #{dest} preserving file types, trying again without preserving them" }
+          FileUtils.rm_rf(dest)
           FileUtils.cp_r(src, dest)
         end
       end
