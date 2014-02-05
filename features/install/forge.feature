@@ -74,7 +74,6 @@ Feature: cli/install/forge
     And the file "puppet/modules/apt/Modulefile" should match /name *'puppetlabs-apt'/
     And the file "puppet/modules/stdlib/Modulefile" should match /name *'puppetlabs-stdlib'/
 
-  @announce
   @veryslow
   Scenario: Handle range version numbers
     Given a file named "Puppetfile" with:
@@ -83,7 +82,7 @@ Feature: cli/install/forge
 
     mod 'puppetlabs/postgresql'
     """
-    When I run `librarian-puppet install --verbose`
+    When I run `librarian-puppet install`
     Then the exit status should be 0
     And the file "modules/postgresql/Modulefile" should match /name *'puppetlabs-postgresql'/
 
@@ -91,8 +90,60 @@ Feature: cli/install/forge
     """
     forge "http://forge.puppetlabs.com"
 
-    mod 'puppetlabs/postgresql', :git => 'git://github.com/puppetlabs/puppet-postgresql', :ref => 'a353e8'
+    mod 'puppetlabs/postgresql', :git => 'git://github.com/puppetlabs/puppet-postgresql'
     """
-    When I run `librarian-puppet install --verbose`
+    When I run `librarian-puppet install`
+    Then the exit status should be 0
+    And the file "modules/postgresql/Modulefile" should match /name *'puppetlabs-postgresql'/
+
+  Scenario: Installing a module that does not exist
+    Given a file named "Puppetfile" with:
+    """
+    forge "http://forge.puppetlabs.com"
+
+    mod 'puppetlabs/xxxxx'
+    """
+    When I run `librarian-puppet install`
+    Then the exit status should be 1
+    And the output should contain "Unable to find module 'puppetlabs/xxxxx' on http://forge.puppetlabs.com"
+
+  Scenario: Install a module with conflicts
+    Given a file named "Puppetfile" with:
+    """
+    forge "http://forge.puppetlabs.com"
+
+    mod 'puppetlabs/apache', '0.6.0'
+    mod 'puppetlabs/stdlib', '<2.2.1'
+    """
+    When I run `librarian-puppet install`
+    Then the exit status should be 1
+    And the output should contain "Could not resolve the dependencies"
+
+  @slow
+  Scenario: Install a module from the Forge with dependencies without version
+    Given a file named "Puppetfile" with:
+    """
+    forge "http://forge.puppetlabs.com"
+
+    mod 'sbadia/gitlab', '0.1.0'
+    """
+    When I run `librarian-puppet install`
+    Then the exit status should be 0
+    And the file "modules/gitlab/Modulefile" should match /version *'0\.1\.0'/
+
+  @veryslow
+  Scenario: Source dependencies from Modulefile
+    Given a file named "Puppetfile" with:
+    """
+    forge "http://forge.puppetlabs.com"
+
+    modulefile
+    """
+    And a file named "Modulefile" with:
+    """
+    name "random name"
+    dependency "puppetlabs/postgresql", "2.4.1"
+    """
+    When I run `librarian-puppet install`
     Then the exit status should be 0
     And the file "modules/postgresql/Modulefile" should match /name *'puppetlabs-postgresql'/
